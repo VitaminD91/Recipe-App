@@ -1,6 +1,7 @@
 import sys
 import recipeDB
-from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QAction, QPushButton, QTableWidget,QTableWidgetItem,QVBoxLayout, QGridLayout, QLabel, QGroupBox, QHBoxLayout
+import editIngredient as eI
+from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QAction, QPushButton, QTableWidget,QTableWidgetItem,QVBoxLayout, QGridLayout, QLabel, QGroupBox, QHBoxLayout, QMessageBox
 from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtCore import pyqtSlot
 
@@ -13,15 +14,14 @@ class IngredientUI(QWidget):
         self.top = 0
         self.width = 1200
         self.height = 800
+        self.setWindowTitle(self.title)
+        self.setGeometry(self.left, self.top, self.width, self.height)
         self.initUI()
         
     def initUI(self):
-        self.setWindowTitle(self.title)
-        self.setGeometry(self.left, self.top, self.width, self.height)
+        
         
         self.create_grid()
-        
-
         self.show()
 
         # Add box layout, add table to box layout and add box layout to widget
@@ -31,26 +31,6 @@ class IngredientUI(QWidget):
 
         #Show widget
         self.show()
-        
-
-    def create_table(self):
-        #Create table
-
-        ingredients = recipeDB.get_all_ingredients()
-        self.tableWidget = QTableWidget()
-        self.tableWidget.setRowCount(len(ingredients))
-        self.tableWidget.setColumnCount(4)
-        i = 0
-        for ingredient in ingredients:
-            self.tableWidget.setItem(i,0, QTableWidgetItem(ingredient['name']))
-            self.tableWidget.setItem(i,1, QTableWidgetItem(ingredient['type']))
-            self.tableWidget.setItem(i,2, QTableWidgetItem(str(ingredient['IsMain'])))
-            i = i+1
-        self.tableWidget.move(0,0)
-
-        # table selection change
-        self.tableWidget.doubleClicked.connect(self.on_click)
-
 
     def create_grid(self):
             #Create grid
@@ -74,6 +54,8 @@ class IngredientUI(QWidget):
         self.gridLayout.addWidget(headerLabel1, 0,0)
         self.gridLayout.addWidget(headerLabel2, 0,1)
         self.gridLayout.addWidget(headerLabel3, 0,2)
+        addButton = QPushButton('Add', self)
+        self.gridLayout.addWidget(addButton, 5, 5)
         
         #populate grid
         i = 1
@@ -96,8 +78,6 @@ class IngredientUI(QWidget):
         self.horizontalGroupBox = QGroupBox()
         layout = QHBoxLayout()
 
-        
-
         editButton = QPushButton('Edit', self)
         editButton.clicked.connect(lambda: self.on_edit_click(id))
         layout.addWidget(editButton)
@@ -108,7 +88,9 @@ class IngredientUI(QWidget):
 
         self.horizontalGroupBox.setLayout(layout)
 
-
+    def updateGrid(self):
+        QWidget().setLayout(self.layout())
+        self.initUI() 
 
     @pyqtSlot()
     def on_click(self):
@@ -118,11 +100,25 @@ class IngredientUI(QWidget):
 
     @pyqtSlot()
     def on_edit_click(self, id):
-        print(id)
+        self.a = eI.EditIngredientWindow(id, self) 
+    
+    def on_delete_confirm_clicked(self, val, id):
+        if val == "&Yes":
+            recipeDB.delete_ingredient(id)
+            self.updateGrid()
+            print("deleting...")
+            
+            
 
     @pyqtSlot()
     def on_delete_click(self, id):
-        print(id)
+        
+        msg = QMessageBox()
+        msg.setInformativeText("Are you Sure?")
+        msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        msg.buttonClicked.connect(lambda val: self.on_delete_confirm_clicked(val.text(), id))
+        x = msg.exec_()
+    
 
 #if __name__ == '__main__':
     #app = QApplication(sys.argv)

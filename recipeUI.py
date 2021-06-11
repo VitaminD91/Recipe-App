@@ -1,7 +1,8 @@
 import sys
 import recipeDB
+import editRecipe as eR
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QAction, QTableWidget,QTableWidgetItem,QVBoxLayout, \
-QPushButton, QGridLayout, QLabel
+QPushButton, QGridLayout, QLabel, QGroupBox, QHBoxLayout
 from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtCore import pyqtSlot
 
@@ -21,20 +22,13 @@ class RecipeUI(QWidget):
         self.setGeometry(self.left, self.top, self.width, self.height)
         
         self.create_grid()
+        self.show()
 
         # Add box layout, add table to box layout and add box layout to widget
         #self.layout = QVBoxLayout()
         #self.layout.addWidget(self.tableWidget) 
         self.setLayout(self.gridLayout) 
-
-        self.SwapPageButton = QPushButton('Ingredients', self)
-        self.SwapPageButton.move(100, 250)
-        self.SwapPageButton.clicked.connect(self.ingredients_button_clicked)
-        #Show widget
         self.show()
-
-    def ingredients_button_clicked(self):
-        print('bababooie')
         
 
 
@@ -44,9 +38,10 @@ class RecipeUI(QWidget):
         recipes = recipeDB.get_all_recipes()
         self.gridLayout = QGridLayout()
 
+        #create bold font
         boldFont = QFont()
         boldFont.setBold(True)
-        
+        #assign labels and set font
         headerLabel1 = QLabel()
         headerLabel1.setText('Name')
         headerLabel1.setFont(boldFont)
@@ -55,9 +50,10 @@ class RecipeUI(QWidget):
         headerLabel2.setFont(boldFont)
         self.gridLayout.addWidget(headerLabel1, 0,0)
         self.gridLayout.addWidget(headerLabel2, 0,1)
-        
+        addButton = QPushButton('Add', self)
+        self.gridLayout.addWidget(addButton, 5, 5)
 
-
+        #populate grid
         i = 1
         for recipe in recipes:
             nameLabel = QLabel()
@@ -65,9 +61,29 @@ class RecipeUI(QWidget):
             timeLabel = QLabel()
             timeLabel.setText(recipe['Time'])
             
+            self.boxesLayout(recipe['id'])
             self.gridLayout.addWidget(nameLabel, i, 0)
             self.gridLayout.addWidget(timeLabel, i, 1)
+            self.gridLayout.addWidget(self.horizontalGroupBox, i, 3)
             i = i+1
+
+    def boxesLayout(self, id):
+        self.horizontalGroupBox = QGroupBox()
+        layout = QHBoxLayout()
+
+        editButton = QPushButton('Edit', self)
+        editButton.clicked.connect(lambda: self.on_edit_click(id))
+        layout.addWidget(editButton)
+
+        deleteButton = QPushButton('Delete', self)
+        deleteButton.clicked.connect(lambda: self.on_delete_click(id))
+        layout.addWidget(deleteButton)
+
+        self.horizontalGroupBox.setLayout(layout)
+
+        def updateGrid(self):
+            QWidget().setLayout(self.layout())
+            self.initUI() 
 
         
 
@@ -94,6 +110,10 @@ class RecipeUI(QWidget):
         for currentQTableWidgetItem in self.tableWidget.selectedItems():
             print(currentQTableWidgetItem.row(), currentQTableWidgetItem.column(), currentQTableWidgetItem.text())
 
+
+    @pyqtSlot()
+    def on_edit_click(self, id):
+        self.a = eR.EditRecipeWindow(id, self) 
         
 
     

@@ -73,6 +73,17 @@ def fetch_all_query(query, props):
 	conn.close()
 	return result
 
+###CONDENSED FETCH ONE###
+def fetch_one_query(query, props):
+	conn = sqlite3.connect(dbname)
+	conn.row_factory = sqlite3.Row
+	c = conn.cursor()
+	c.execute(query, props)
+	result = c.fetchone()
+	conn.close()
+	return result
+		
+
 ###CREATE AN INDIVIDUAL INGREDIENT###
 def create_ingredient(type, name, is_main):
 	execute_query('INSERT INTO Ingredient(Type, Name, IsMain) VALUES (?, ?, ?)', [type, name, is_main])
@@ -112,19 +123,29 @@ def update_recipe_name(recipe_id, name):
 
 ###DELETE AN INGREDIENT###
 def delete_ingredient(ingredient_id):
-	c.execute_query('DELETE FROM Ingredient WHERE Id = ?', [ingredient_id])
+	execute_query('DELETE FROM Ingredient WHERE Id = ?', [ingredient_id])
 
 
 ###DELETE A RECIPE###
 def delete_recipe(recipe_id):
-	c.execute_query('DELETE FROM Recipe WHERE Id = ?', [recipe_id])
+	execute_query('DELETE FROM Recipe WHERE Id = ?', [recipe_id])
 
 
 ###SORT RECIPE BY MAIN INGREDIENT###
 def get_recipes_by_main(type):
-	results = c.fetch_all_query('''SELECT r.Name FROM Recipe r
+	results = fetch_all_query('''SELECT r.Name FROM Recipe r
 				 INNER JOIN RecipeIngredients ri ON r.Id=ri.RecipeId
 				 INNER JOIN Ingredient i ON i.Id = ri.IngredientId
 				 WHERE Type = ? AND IsMain = 1 ''', [type])
 	return results
+	
+###GET INGREDIENT BY ID###
+def get_ingredient_by_id(ingredient_id):
+	result = fetch_one_query('SELECT * FROM Ingredient WHERE Id =?', [ingredient_id])
+	return result
+
+###GET RECIPE BY ID###
+def get_recipe_by_id(recipe_id):
+	result = fetch_one_query('SELECT * FROM Recipe WHERE Id =?', [recipe_id])
+	return result
 	
