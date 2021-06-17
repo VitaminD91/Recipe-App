@@ -1,6 +1,7 @@
 import sys
 import ingredientUI as iUI
 import recipeUI as rUI
+import dashUI as dUI
 from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel, QPushButton, QWidget, QAction, QTabWidget,QVBoxLayout
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import pyqtSlot
@@ -9,7 +10,7 @@ class Main(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.title = 'PyQt5'
+        self.title = 'Recipe App'
         self.left = 0
         self.top = 0
         self.width = 300
@@ -42,8 +43,7 @@ class MyTableWidget(QWidget):
         
         # Create Dashboard tab
         self.dashTab.layout = QVBoxLayout(self)
-        self.pushButton1 = QPushButton("Shuffle")
-        self.dashTab.layout.addWidget(self.pushButton1)
+        self.dashTab.layout.addWidget(dUI.DashUI())
         self.dashTab.setLayout(self.dashTab.layout)
 
         # Create ingredient tab
@@ -60,20 +60,7 @@ class MyTableWidget(QWidget):
         self.layout.addWidget(self.tabs)
         self.setLayout(self.layout)
         
-        
-    
-    def weekBoxes(self):
-        
-        weekList = ["Monday", "Tuesday",  "Wednesday", "Thursday", "Friday",
-                    "Saturday", "Sunday"]
-        self.horizontalGroupBox = QHBoxLayout()
-        
-        i = 0
-        weekLabel = QLabel()
-        weekLabel.setText('Monday')
-        self.horizontalGroupBox.addWidget(weekLabel)
-        self.horizontalGroupBox.setLayout(layout)
-        self.show
+        self.show()
         
     @pyqtSlot()
     def on_click(self):

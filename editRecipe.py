@@ -1,11 +1,11 @@
 import sys
 import recipeDB
-from PyQt5 import QtGui
+from PyQt5 import QtGui, QtWidgets, QtCore
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QPushButton, QVBoxLayout, QLineEdit,
-                             QComboBox, QToolTip, QMessageBox, QLabel)
+                             QComboBox, QToolTip, QMessageBox, QLabel, QWidget)
 from PyQt5.QtCore import QSize
 
-class EditRecipeWindow(QMainWindow):
+class EditRecipeWindow(QWidget):
     def __init__(self, id, recipeUI):
         super().__init__()
         
@@ -42,6 +42,10 @@ class EditRecipeWindow(QMainWindow):
 
         vLayout.addWidget(timeLabel)
         vLayout.addWidget(self.timeEditCombo)
+
+        ingredientsButton = QPushButton('Ingredients', self)
+        #ingredientsButton.clicked.connect(self.onIngredientsClicked)
+        vLayout.addWidget(ingredientsButton)
 
         saveButton = QPushButton('Save', self)
         saveButton.clicked.connect(self.onSaveClicked)
